@@ -13,4 +13,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Hello World!" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center|bottom">
+        <Button
+            android:id="@+id/button_scan"
+            android:layout_width="300px"
+            android:layout_height="150px"
+            android:text="Scan"/>
+        <Button
+            android:id="@+id/button_today"
+            android:layout_width="300px"
+            android:layout_height="150px"
+            android:text="Today"/>
+    </LinearLayout>
 </RelativeLayout>
