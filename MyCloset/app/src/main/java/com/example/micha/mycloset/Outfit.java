@@ -5,7 +5,7 @@ package com.example.micha.mycloset;
  */
 
 public class Outfit {
-    public String key;
+//    public String key;
     public Clothes hat;
     public Clothes shirt;
     public Clothes pants;
@@ -14,8 +14,8 @@ public class Outfit {
     public Outfit() {
     }
 
-    public Outfit(String key, Clothes hat, Clothes shirt, Clothes pants, Clothes shoes) {
-        this.key = key;
+    public Outfit(Clothes hat, Clothes shirt, Clothes pants, Clothes shoes) {
+//        this.key = key;
         this.hat = hat;
         this.shirt = shirt;
         this.pants = pants;
@@ -26,7 +26,7 @@ public class Outfit {
     public String toString() {
         return new StringBuilder()
                 .append("{Outfit:")
-                .append(" key=").append(key)
+//                .append(" key=").append(key)
                 .append(", hat=").append(hat.toString())
                 .append(", shirt:").append(shirt.toString())
                 .append(", pants:").append(pants.toString())
