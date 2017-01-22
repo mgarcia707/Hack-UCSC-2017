@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
         mChooseButton = (Button) findViewById(R.id.button_choose);
         mFinishButton = (Button) findViewById(R.id.button_submit);
         mWhenEditText = (EditText) findViewById(R.id.when_edit_text);
-        mColorEditText = (EditText) findViewById(R.id.when_edit_text);
+        mColorEditText = (EditText) findViewById(R.id.color_edit_text);
         mTypeSpinner = (Spinner) findViewById(R.id.type_spinner);
 
         String[] items = new String[]{"Hat", "Shirt", "Pants", "Shoes"};
@@ -177,6 +177,12 @@ public class MainActivity extends AppCompatActivity {
         };
 
         mDatabase.child("today").addListenerForSingleValueEvent(postListener);
+    }
+
+    // Allows transition to next page
+    public void activityImage(View v) {
+        Intent intent = new Intent(this, ImageActivity.class);
+        startActivity(intent);
     }
 
     String mCurrentPhotoPath;
