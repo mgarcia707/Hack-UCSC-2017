@@ -22,6 +22,10 @@ app.use(function(err, req, res, next) {
 });
 
 app.get('/', routes.index);
+app.get('/all', routes.all);
+app.get('/addSample/:numSamples', routes.addSample);
+
+app.post('/todaysoutfit', routes.todaysOutfit);
 
 app.listen(port);
 console.log('Magic happens on port '+port);
