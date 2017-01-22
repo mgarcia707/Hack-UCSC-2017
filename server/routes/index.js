@@ -8,7 +8,19 @@ var serverApp = firebase.initializeApp({
 var database = serverApp.database();
 
 var colors = ['white', 'red', 'orange', 'yellow', 'green', 'blue', 'purple', 'black'];
-var type = ['hat', 'shirt', 'pants', 'shoes'];
+var type = [{
+  type: 'hat',
+  url: 'https://firebasestorage.googleapis.com/v0/b/hackucsc2016-a33ef.appspot.com/o/images%2Fashat.jpeg?alt=media&token=4d1c0f11-307d-48b8-99cd-2e5757e42e68'
+}, {
+  type: 'shirt',
+  url: 'https://firebasestorage.googleapis.com/v0/b/hackucsc2016-a33ef.appspot.com/o/images%2Fblacktshirt.jpg?alt=media&token=0445078e-a55a-457b-be73-32d715c36745'
+}, {
+  type: 'pants',
+  url: 'https://firebasestorage.googleapis.com/v0/b/hackucsc2016-a33ef.appspot.com/o/images%2Fjeans.jpg?alt=media&token=d3bd8a86-3b0e-4fc2-9bb8-6c207bbf026a'
+}, {
+  type: 'shoes',
+  url: 'https://firebasestorage.googleapis.com/v0/b/hackucsc2016-a33ef.appspot.com/o/images%2Fnikeshoe.jpeg?alt=media&token=0a1159ad-3fe7-4607-99ed-aeeb13b6ead6'
+}];
 var whenSources = {
   lightSource: ['sun', 'moon'],
   lighting: ['dark', 'light'],
@@ -40,11 +52,14 @@ exports.addSample = function(req, res) {
       when.push(whenSources[ele][Math.floor(Math.random() * (whenSources[ele].length))]);
     }
 
+    var typeOption = type[Math.floor(Math.random() * (type.length))];
+
     database.ref().child('closet').child(key).set({
       key: key,
       color: colors[Math.floor(Math.random() * (colors.length))],
-      type: type[Math.floor(Math.random() * (type.length))],
-      when: when
+      type: typeOption.type,
+      when: when,
+      url: typeOption.url
     });
   }
 
@@ -78,8 +93,6 @@ exports.todaysOutfit = function(req, res) {
       shoes: ''
     };
     var valid = true;
-
-    console.log(colors);
 
     for (var ele in colors) {
       valid = true;

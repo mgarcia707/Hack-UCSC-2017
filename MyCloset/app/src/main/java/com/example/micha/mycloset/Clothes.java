@@ -15,7 +15,7 @@ public class Clothes {
     public String color;
     public String type;
     public List<String> when;
-    public String downloadUrl;
+    public String url;
 
     public Clothes() {
     }
@@ -25,7 +25,7 @@ public class Clothes {
         this.color = color;
         this.type = type;
         this.when = when;
-        this.downloadUrl = downloadUrl.toString();
+        this.url = downloadUrl.toString();
     }
 
     @Override
@@ -36,7 +36,7 @@ public class Clothes {
                 .append(", color=").append(color)
                 .append(", type:").append(type)
                 .append(", when:").append(when.toString())
-                .append(", url:").append(downloadUrl.toString())
+                .append(", url:").append(url.toString())
                 .append("}").toString();
     }
 }
