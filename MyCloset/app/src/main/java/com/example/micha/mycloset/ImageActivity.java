@@ -11,3 +11,7 @@ public class ImageActivity extends AppCompatActivity {
         setContentView(R.layout.activity_image);
     }
 }
+
+//
+//    Intent intent = new Intent(mContext, LoginAccount.class);
+//    startActivity(intent);
