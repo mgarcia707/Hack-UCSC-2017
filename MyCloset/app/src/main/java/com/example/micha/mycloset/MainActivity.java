@@ -6,7 +6,10 @@ import android.os.Bundle;
 import android.util.Log;
 
 import android.support.v7.app.ActionBar.LayoutParams;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.view.View;
 import android.content.Intent;
@@ -47,11 +50,12 @@ import com.google.android.gms.tasks.OnFailureListener;
 public class MainActivity extends AppCompatActivity {
 
     private Button mScanButton;
-    private Button mTodayButton;
+//    private Button mTodayButton;
     private Button mChooseButton;
     private Button mUploadButton;
     private ImageView mImageView;
     private LinearLayout mLinearLayout;
+    private Spinner mTypeSpinner;
 
     private Uri filePath;
     private DatabaseReference mDatabase;
@@ -67,24 +71,29 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mLinearLayout = (LinearLayout) findViewById(R.id.linear_edit_text);
+        mLinearLayout = (LinearLayout) findViewById(R.id.linear_color_edit_text);
         mImageView = (ImageView) findViewById(R.id.image_view);
         mScanButton = (Button) findViewById(R.id.button_scan);
-        mTodayButton = (Button) findViewById(R.id.button_today);
+//        mTodayButton = (Button) findViewById(R.id.button_today);
         mChooseButton = (Button) findViewById(R.id.button_choose);
         mUploadButton = (Button) findViewById(R.id.button_upload);
+        mTypeSpinner = (Spinner) findViewById(R.id.type_spinner);
+
+        String[] items = new String[]{"Hat", "Shirt", "Pants", "Shoes"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, items);
+        mTypeSpinner.setAdapter(adapter);
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
         storageReference = FirebaseStorage.getInstance().getReference();
 
-        mTodayButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                // Perform action on click
-                for (int i = 0; i < allEds.size(); i++) {
-                    Log.d("INTERN", allEds.get(i).getText().toString());
-                }
-            }
-        });
+//        mTodayButton.setOnClickListener(new View.OnClickListener() {
+//            public void onClick(View v) {
+//                // Perform action on click
+//                for (int i = 0; i < allEds.size(); i++) {
+//                    Log.d("INTERN", allEds.get(i).getText().toString());
+//                }
+//            }
+//        });
 
         mScanButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
