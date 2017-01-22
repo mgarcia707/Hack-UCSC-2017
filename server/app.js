@@ -25,7 +25,8 @@ app.get('/', routes.index);
 app.get('/all', routes.all);
 app.get('/addSample/:numSamples', routes.addSample);
 
-app.post('/todaysoutfit', routes.todaysOutfit);
+app.post('/todaysOutfit', routes.todaysOutfit);
+app.post('/addClothes', routes.addClothes);
 
 app.listen(port);
 console.log('Magic happens on port '+port);

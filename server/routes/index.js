@@ -124,3 +124,20 @@ exports.todaysOutfit = function(req, res) {
     }
   });
 };
+
+exports.addClothes = function(req, res) {
+  var body = req.body;
+  var clothes = {
+    type: body.type,
+    color: body.color,
+    when: body.when
+  };
+
+  var key = database.ref().child('clothes').push().key;
+  database.ref().child('closet').child(key).set(clothes);
+
+  res.json({
+    code: 200,
+    message: 'added the object'
+  });
+}
