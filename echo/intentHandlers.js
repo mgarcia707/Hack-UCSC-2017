@@ -9,19 +9,24 @@
 */
 
 'use strict';
-var textHelper = require('./node_modules/textHelper'),
-    storage = require('./node_modules/storage');
+var http = require('http');
+var textHelper = require('./textHelper'),
+    storage = require('./storage');
 
 var registerIntentHandlers = function (intentHandlers, skillContext) {
 	
+	intentHandlers.Suggestion = function (intent, session, response) {
+		http.get("http://hackucsc2017.herokuapp.com/addSample/1", function(rc) {
+			console.log(rc.req);
+			console.log(rc.statusCode);
+		});
+	};
+	
+	
 	intentHandlers.CreateOutfit = function (intent, session, response) {
-		console.log(intent.slots[0].name.value);
-		var newOutfitName = textHelper.getOutfitName(intent.slots.name.value);
+		var newOutfitName = intent.slots[0].value;
 		var reprompt = textHelper.nextHelp;
-		if(!newOutfitName){
-			response.ask('This outfit already exists in the closet. What would you like to do with it?', reprompt);
-			return;
-		}
+
 		storage.loadCloset(session, function (currentCloset) {
 			currentCloset.data.outfits.newOutfitName = {};
 			response.ask('Outfit has been created and added to closet. How would you like to modify this outfit?', reprompt);
@@ -39,68 +44,23 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
 	
 	var outfitCreator = intentHandlers.CreateOutfit;
     
-	intentHandlers.AddTop = function (intent, session, response, outfitCreator){
-		console.log(intent);
-		var newTopName = textHelper.getTopName(intent.slots.name.value);
-		var reprompt = textHelper.nextHelp;
-		if(!newTopName){
-			response.ask('This top already exists for the outfit. What else would you like to add or do?', reprompt);
-			return;
-		}
-		storage.loadCloset(session, function (currentCloset) {
-			currentCloset.data.outfit.outfitCreator["top"]= intent.slots.name.value;
-			response.ask('Top added. What else would you like to add or do?', reprompt);
+	intentHandlers.AddClothes = function (intent, session, response, outfitCreator){
+		http.get("http://hackucsc2017.herokuapp.com/addSample/1", function(rc) {
 			
-			currentCloset.save(function () {
-				if (reprompt) {
-					response.ask('What else would you like to do to your closet?', reprompt);
-				} else {
-					response.tell('What else would you like to do to your closet?');
-				}
-			});
-		});
-	};
-	
-	intentHandlers.AddBottom = function (intent, session, response, outfitCreator){
-		console.log(intent);
-		var newBottomName = textHelper.getBottomName(intent.slots.name.value);
-		var reprompt = textHelper.nextHelp;
-		if(!newBottomName){
-			response.ask('This bottom already exists for the outfit. What else would you like to add or do?', reprompt);
-			return;
-		}
-		storage.loadCloset(session, function (currentCloset) {
-			currentCloset.data.outfit.outfitCreator.bottom = intent.slots.name.value;
-			response.ask('Bottom added. What else would you like to add or do?', reprompt);
+			var newClothes = [intent.slots[0].value, intent.slots[1].value, intent.slots[2].value];
+			var reprompt = textHelper.nextHelp;
 			
-			currentCloset.save(function () {
-				if (reprompt) {
-					response.ask('What else would you like to do to your closet?', reprompt);
-				} else {
-					response.tell('What else would you like to do to your closet?');
-				}
-			});
-		});
-	};
-	
-	intentHandlers.AddJacket = function (intent, session, response, outfitCreator){
-		console.log(intent);
-		var newJacketName = textHelper.getJacketName(intent.slots.name.value);
-		var reprompt = textHelper.nextHelp;
-		if(!newJacketName){
-			response.ask('This jacket already exists for the outfit. What else would you like to add or do?', reprompt);
-			return;
-		}
-		storage.loadCloset(session, function (currentCloset) {
-			currentCloset.data.outfit.outfitCreator.jacket = intent.slots.name.value;
-			response.ask('Jacket added. What else would you like to add or do?', reprompt);
-			
-			currentCloset.save(function () {
-				if (reprompt) {
-					response.ask('What else would you like to do to your closet?', reprompt);
-				} else {
-					response.tell('What else would you like to do to your closet?');
-				}
+			storage.loadCloset(session, function (currentCloset) {
+				currentCloset.data.outfit.outfitCreator["top"] = newClothes;
+				response.ask('Clothes added to outfit. What else would you like to add or do?', reprompt);
+				
+				currentCloset.save(function () {
+					if (reprompt) {
+						response.ask('What else would you like to do to your closet?', reprompt);
+					} else {
+						response.tell('What else would you like to do to your closet?');
+					}
+				});
 			});
 		});
 	};
@@ -110,14 +70,6 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
             response.ask('Closet has been reset. ', 'How else would you like to interact?');
         });
     };
-	
-	intentHandlers.RemoveOutfit = function (intent, session, response) {
-		//removes an outfit
-		storage.loadCloset(session, function (currentCloset) {
-			var reprompt = textHelper.nextHelp;
-			response.ask('What outfit would you like to remove? ', reprompt);	
-		});
-	};
 	
 	intentHandlers.DeleteOutfit = function (intent, session, response) {
 		storage.loadCloset(session, function (currentCloset) {

@@ -9,9 +9,9 @@
 */
 
 'use strict';
-var AlexaSkill = require('./node_modules/AlexaSkill'),
-    eventHandlers = require('./node_modules/eventHandlers'),
-    intentHandlers = require('./node_modules/intentHandlers');
+var AlexaSkill = require('./AlexaSkill'),
+    eventHandlers = require('./eventHandlers'),
+    intentHandlers = require('./intentHandlers');
 
 var APP_ID = undefined;//replace with "amzn1.echo-sdk-ams.app.[your-unique-value-here]";
 var skillContext = {};

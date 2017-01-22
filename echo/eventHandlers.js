@@ -9,8 +9,8 @@
 */
 
 'use strict';
-var storage = require('./node_modules/storage'),
-    textHelper = require('./node_modules/textHelper');
+var storage = require('./storage'),
+    textHelper = require('./textHelper');
 
 var registerEventHandlers = function (eventHandlers, skillContext) {
     eventHandlers.onSessionStarted = function (sessionStartedRequest, session) {

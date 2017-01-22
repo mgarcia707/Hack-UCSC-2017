@@ -34,9 +34,9 @@ var storage = (function () {
             //so next time we can save a read from dynamoDB
             this._session.attributes.currentCloset = this.data;
             dynamodb.putItem({
-                TableName: 'VirtualClosetData',
+                TableName: 'NewCloset',
                 Item: {
-                    CustomerId: {
+                    Outfit: {
                         S: this._session.user.userId
                     },
                     Data: {
@@ -62,9 +62,9 @@ var storage = (function () {
                 return;
             }
             dynamodb.getItem({
-                TableName: 'VirtualClosetData',
+                TableName: 'NewCloset',
                 Key: {
-                    CustomerId: {
+                    Outfit: {
                         S: session.user.userId
                     }
                 }
