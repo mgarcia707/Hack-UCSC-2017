@@ -5,21 +5,27 @@ package com.example.micha.mycloset;
  */
 
 import java.util.List;
+import android.net.Uri;
 
+import com.google.firebase.database.IgnoreExtraProperties;
+
+@IgnoreExtraProperties
 public class Clothes {
     public String key;
     public String color;
     public String type;
     public List<String> when;
+    public String downloadUrl;
 
     public Clothes() {
     }
 
-    public Clothes(String key, String color, String type, List<String> when) {
+    public Clothes(String key, String color, String type, List<String> when, Uri downloadUrl) {
         this.key = key;
         this.color = color;
         this.type = type;
         this.when = when;
+        this.downloadUrl = downloadUrl.toString();
     }
 
     @Override
@@ -30,6 +36,7 @@ public class Clothes {
                 .append(", color=").append(color)
                 .append(", type:").append(type)
                 .append(", when:").append(when.toString())
+                .append(", url:").append(downloadUrl.toString())
                 .append("}").toString();
     }
 }

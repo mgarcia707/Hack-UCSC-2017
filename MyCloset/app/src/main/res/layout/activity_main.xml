@@ -54,6 +54,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
                 <EditText
+                    android:id="@+id/color_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
             </LinearLayout>
@@ -78,6 +79,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
                 <EditText
+                    android:id="@+id/when_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
             </LinearLayout>
@@ -88,7 +90,7 @@
                 android:layout_height="match_parent"
                 android:orientation="horizontal">
                 <Button
-                    android:id="@+id/button_upload"
+                    android:id="@+id/button_submit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"

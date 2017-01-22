@@ -24,6 +24,7 @@ import android.support.v4.content.FileProvider;
 import android.widget.LinearLayout;
 import android.app.ProgressDialog;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -52,14 +53,17 @@ public class MainActivity extends AppCompatActivity {
     private Button mScanButton;
 //    private Button mTodayButton;
     private Button mChooseButton;
-    private Button mUploadButton;
+    private Button mFinishButton;
     private ImageView mImageView;
     private LinearLayout mLinearLayout;
     private Spinner mTypeSpinner;
+    private EditText mWhenEditText;
+    private EditText mColorEditText;
 
     private Uri filePath;
     private DatabaseReference mDatabase;
     private StorageReference storageReference;
+
 
     private List<EditText> allEds = new ArrayList<EditText>();
 
@@ -76,7 +80,9 @@ public class MainActivity extends AppCompatActivity {
         mScanButton = (Button) findViewById(R.id.button_scan);
 //        mTodayButton = (Button) findViewById(R.id.button_today);
         mChooseButton = (Button) findViewById(R.id.button_choose);
-        mUploadButton = (Button) findViewById(R.id.button_upload);
+        mFinishButton = (Button) findViewById(R.id.button_submit);
+        mWhenEditText = (EditText) findViewById(R.id.when_edit_text);
+        mColorEditText = (EditText) findViewById(R.id.when_edit_text);
         mTypeSpinner = (Spinner) findViewById(R.id.type_spinner);
 
         String[] items = new String[]{"Hat", "Shirt", "Pants", "Shoes"};
@@ -106,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
                 showFileChooser();
             }
         });
-        mUploadButton.setOnClickListener(new View.OnClickListener() {
+        mFinishButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 uploadFile();
             }
@@ -243,6 +249,19 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void submitClothes(Uri filePath) {
+        String key = mDatabase.child("closet").push().getKey();
+        String color = mColorEditText.getText().toString();
+        String type = mTypeSpinner.getSelectedItem().toString();
+        List whenList = new ArrayList<String>();
+        whenList.add(0, mWhenEditText.getText().toString());
+
+        Clothes clothes = new Clothes(key, color, type, whenList, filePath);
+        Log.d("INTERN", clothes.toString());
+
+        mDatabase.child("closet").child(key).setValue(clothes);
+    }
+
     //this method will upload the file
     private void uploadFile() {
         //if there is a file to upload
@@ -266,6 +285,8 @@ public class MainActivity extends AppCompatActivity {
 
                             //and displaying a success toast
                             Toast.makeText(getApplicationContext(), "File Uploaded ", Toast.LENGTH_LONG).show();
+
+                            submitClothes(taskSnapshot.getDownloadUrl());
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
