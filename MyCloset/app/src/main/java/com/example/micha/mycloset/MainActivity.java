@@ -7,9 +7,11 @@ import android.util.Log;
 
 import android.support.v7.app.ActionBar.LayoutParams;
 import android.widget.Button;
+import android.widget.Toast;
 import android.view.View;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.provider.MediaStore;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -17,6 +19,7 @@ import android.os.Environment;
 import android.net.Uri;
 import android.support.v4.content.FileProvider;
 import android.widget.LinearLayout;
+import android.app.ProgressDialog;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,22 +28,39 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 
+import android.support.annotation.NonNull;
+
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.google.firebase.storage.OnProgressListener;
+
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.OnFailureListener;
+
 public class MainActivity extends AppCompatActivity {
 
-    private DatabaseReference mDatabase;
     private Button mScanButton;
     private Button mTodayButton;
+    private Button mChooseButton;
+    private Button mUploadButton;
     private ImageView mImageView;
     private LinearLayout mLinearLayout;
 
-    static final int REQUEST_IMAGE_CAPTURE = 1;
+    private Uri filePath;
+    private DatabaseReference mDatabase;
+    private StorageReference storageReference;
+
     private List<EditText> allEds = new ArrayList<EditText>();
+
+    static final int REQUEST_IMAGE_CAPTURE = 1;
+    private static final int PICK_IMAGE_REQUEST = 234;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +71,11 @@ public class MainActivity extends AppCompatActivity {
         mImageView = (ImageView) findViewById(R.id.image_view);
         mScanButton = (Button) findViewById(R.id.button_scan);
         mTodayButton = (Button) findViewById(R.id.button_today);
+        mChooseButton = (Button) findViewById(R.id.button_choose);
+        mUploadButton = (Button) findViewById(R.id.button_upload);
 
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        storageReference = FirebaseStorage.getInstance().getReference();
 
         mTodayButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -68,8 +92,17 @@ public class MainActivity extends AppCompatActivity {
                 dispatchTakePictureIntent();
             }
         });
+        mChooseButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                showFileChooser();
+            }
+        });
+        mUploadButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                uploadFile();
+            }
+        });
 
-        mDatabase = FirebaseDatabase.getInstance().getReference();
 
         ValueEventListener postListener = new ValueEventListener() {
             @Override
@@ -83,16 +116,16 @@ public class MainActivity extends AppCompatActivity {
 
                 EditText ed;
 
-                for (int i = 0; i < post.size(); i++) {
-                    Log.d("INTERN", post.get(i).toString());
-                    ed = new EditText(MainActivity.this);
-                    allEds.add(ed);
-                    ed.setId(i);
-                    ed.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
-                            LayoutParams.WRAP_CONTENT));
-                    ed.setText(post.get(i).color);
-                    mLinearLayout.addView(ed);
-                }
+//                for (int i = 0; i < post.size(); i++) {
+//                    Log.d("INTERN", post.get(i).toString());
+//                    ed = new EditText(MainActivity.this);
+//                    allEds.add(ed);
+//                    ed.setId(i);
+//                    ed.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
+//                            LayoutParams.WRAP_CONTENT));
+//                    ed.setText(post.get(i).color);
+//                    mLinearLayout.addView(ed);
+//                }
 
                 // For Outfit
 //                Outfit post = new Outfit();
@@ -159,6 +192,7 @@ public class MainActivity extends AppCompatActivity {
                 photoFile = createImageFile();
             } catch (IOException ex) {
                 // Error occurred while creating the File
+                Log.d("INTERN", ex.toString());
             }
             // Continue only if the File was successfully created
             if (photoFile != null) {
@@ -171,12 +205,85 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //method to show file chooser
+    private void showFileChooser() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+    }
+
+    //handling the image chooser activity result
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
-            mImageView.setImageBitmap(imageBitmap);
+            File f = new File(mCurrentPhotoPath);
+            filePath = Uri.fromFile(f);
+            Bitmap myImg = BitmapFactory.decodeFile(filePath.getPath());
+            mImageView.setImageBitmap(myImg);
+        } else if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+            filePath = data.getData();
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), filePath);
+                mImageView.setImageBitmap(bitmap);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    //this method will upload the file
+    private void uploadFile() {
+        //if there is a file to upload
+        if (filePath != null) {
+            //displaying a progress dialog while upload is going on
+            final ProgressDialog progressDialog = new ProgressDialog(this);
+            progressDialog.setTitle("Uploading");
+            progressDialog.show();
+
+            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+            String imageFileName = "JPEG_" + timeStamp + "_";
+
+            StorageReference riversRef = storageReference.child("images/"+imageFileName+".jpg");
+            riversRef.putFile(filePath)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            //if the upload is successfull
+                            //hiding the progress dialog
+                            progressDialog.dismiss();
+
+                            //and displaying a success toast
+                            Toast.makeText(getApplicationContext(), "File Uploaded ", Toast.LENGTH_LONG).show();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            //if the upload is not successfull
+                            //hiding the progress dialog
+                            progressDialog.dismiss();
+
+                            //and displaying error message
+                            Toast.makeText(getApplicationContext(), exception.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    })
+                    .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                            //calculating progress percentage
+                            double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
+
+                            //displaying percentage in progress dialog
+                            progressDialog.setMessage("Uploaded " + ((int) progress) + "%...");
+                        }
+                    });
+        }
+        //if there is not any file
+        else {
+            //you can display an error toast
         }
     }
 }

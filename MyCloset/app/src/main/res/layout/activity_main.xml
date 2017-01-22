@@ -9,14 +9,32 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.micha.mycloset.MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/button_choose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="#e5d41a"
+            android:text="Choose" />
+
+        <Button
+            android:id="@+id/button_scan"
+            android:layout_width="300px"
+            android:layout_height="150px"
+            android:text="Scan"/>
+    </LinearLayout>
+
     <ImageView
         android:id="@+id/image_view"
         android:layout_width="match_parent"
         android:layout_height="400px" />
+
     <ScrollView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content">
@@ -28,15 +46,18 @@
 
         </LinearLayout>
     </ScrollView>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center|bottom">
         <Button
-            android:id="@+id/button_scan"
-            android:layout_width="300px"
-            android:layout_height="150px"
-            android:text="Scan"/>
+            android:id="@+id/button_upload"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="#e5d41a"
+            android:text="Upload" />
         <Button
             android:id="@+id/button_today"
             android:layout_width="300px"
